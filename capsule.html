@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Time Capsule – Write to Your Future</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+  body {
+    background-color: #0a0a0f !important;
+    color: #000000 !important;
+    font-family: "Poppins", sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+header {
+      background-color: #1a1a2e;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(128, 0, 255, 0.18);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    } 
+    nav a {
+      color: #c5b8ff;
+      margin: 0 12px;
+      text-decoration: none;
+      font-size: 16px;
+    }
+
+    nav a:hover {
+      color:#fff;
+    }
+    
+    .logo-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #9d4edd;
+      margin: 0;
+    }
+    
+    .logo-title h2 {
+      color: #c5b8ff;
+      font-size: 18px;
+      margin: 0;
+  line-height: 1;
+    }
+
+
+  .card {
+    background-color: #1a1a2e !important;
+    color: #e0d9ff !important;
+    border: none !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.75rem 1.5rem rgba(128, 0, 255, 0.15);
+  }
+
+ 
+  .form-control, .btn {
+    border-radius: 0.6rem !important;
+  }
+
+  .form-control {
+    background-color: #0f0f17 !important;
+    color: #e0d9ff !important;
+    border: 1px solid rgba(157, 78, 237, 0.25) !important;
+  }
+
+  .form-control:focus {
+    background-color: #151526 !important;
+    border-color: #9d4edd !important;
+    box-shadow: 0 0 0 0.25rem rgba(157, 78, 237, 0.25) !important;
+  }
+
+  .btn-primary {
+    background-color: #9d4edd !important;
+    border-color: #9d4edd !important;
+  }
+
+  .btn-primary:hover {
+    background-color: #b57eff !important;
+    border-color: #b57eff !important;
+  }
+
+  
+  #openResult .locked {
+    border-left: 4px solid #010100;
+    padding-left: 0.75rem;
+  }
+
+  #openResult .unlocked {
+    border-left: 4px solid rgba(128, 0, 255, 0.18);
+    padding-left: 0.75rem;
+  }
+
+  small, .form-text {
+    color: #a89df7 !important;
+  }
+
+
+  textarea#message {
+    resize: vertical !important;
+  }
+
+  .toast.text-bg-dark {
+    background-color: #1a1a2e !important;
+  }
+
+  footer{background-color:#1a1a2e;text-align:center;padding:12px;color:#bdb2ff;font-size:13px;border-top:1px solid #2a2a40}
+
+
+
+
+
+
+
+/* Light/Dark Mode Variables */
+:root {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #1a1a2e;
+    --bg-card: #171722;
+    --text-primary: #e0d9ff;
+    --text-secondary: #c5b8ff;
+    --text-muted: #bdb2ff;
+    --accent-primary: #9d4edd;
+    --accent-secondary: #c77dff;
+    --border-color: #2a2a40;
+    --shadow-color: rgba(128, 0, 255, 0.18);
+}
+
+[data-theme="light"] {
+    --bg-primary: #f8f9fa;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --text-primary: #2d3748;
+    --text-secondary: #4a5568;
+    --text-muted: #718096;
+    --accent-primary: #7c3aed;
+    --accent-secondary: #8b5cf6;
+    --border-color: #e2e8f0;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Theme Toggle Styles */
+.theme-toggle {
+    margin-left: 20px;
+}
+
+.theme-btn {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.theme-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+/* Update existing styles to use CSS variables */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: "Poppins", sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+header {
+    background-color: var(--bg-secondary);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+nav a {
+    color: var(--text-secondary);
+    margin: 0 12px;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+nav a:hover {
+    color: var(--accent-secondary);
+}
+
+.logo-title h2 {
+    color: var(--text-secondary);
+    font-size: 18px;
+    margin: 0;
+    line-height: 1;
+}
+
+footer {
+    background-color: var(--bg-secondary);
+    text-align: center;
+    padding: 15px;
+    color: var(--text-muted);
+    font-size: 14px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* For generator.html */
+.card {
+    width: 100%;
+    max-width: 720px;
+    background: var(--bg-card);
+    border-radius: 14px;
+    padding: 28px;
+    box-shadow: 0 8px 30px var(--shadow-color);
+}
+
+textarea#topic {
+    width: 100%;
+    height: 100px;
+    padding: 14px 44px 14px 14px;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box, 
+                linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)) border-box;
+    color: var(--text-primary);
+    font-size: 15px;
+    line-height: 1.4;
+    resize: none;
+    outline: none;
+    box-shadow: 0 0 14px var(--shadow-color);
+}
+
+/* For capsule.html Bootstrap overrides */
+.card {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.form-control {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+</style>
+
+</head>
+
+ <body> 
+  <header>
+    <div class="logo-title">
+        <img src="vtc2.jpeg" alt="VTC" class="logo">
+        <h2 style="margin:0;color:#c5b8ff;font-size:18px">Virtual Time Capsule</h2>
+    </div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="auth.html">Profile</a>
+        <a href="generator.html">Generator</a>
+        <a href="capsule.html">Capsule</a>
+    </nav>
+<div class="theme-toggle">
+    <button id="themeToggle" class="theme-btn" aria-label="Toggle dark mode">
+        <span class="theme-icon">🌙</span>
+    </button>
+</div>
+</header>
+
+  <main class="container py-5">
+    <section id="create" class="mb-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="card shadow-lg rounded-4 border-0">
+            <div class="card-body p-4 p-md-5">
+              <div class="d-flex align-items-center gap-2 mb-3">
+                <div class="capsule-logo rounded-circle d-inline-flex align-items-center justify-content-center">
+                  <span class="logo-dot"></span>
+                </div>
+                <h1 class="h3 mb-0">Write your message to the future</h1>
+              </div>
+
+              <form id="capsuleForm" novalidate>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="loginName" class="form-label">Your name or login</label>
+                    <input type="text" class="form-control form-control-lg" id="loginName" placeholder="e.g., Arsen" required>
+                    <div class="invalid-feedback">Please enter your name or login.</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="openDate" class="form-label">Open date & time</label>
+                    <input type="datetime-local" class="form-control form-control-lg" id="openDate" step="60" required>
+                    <div class="form-text">You (or anyone with the code) can open the capsule on or after this date & time.</div>
+                    <div class="invalid-feedback">Please choose a valid open date & time.</div>
+                  </div>
+                  <div class="col-12">
+                    <label for="message" class="form-label">Message</label>
+                    <textarea id="message" class="form-control" rows="6" placeholder="Write your message to the future..." maxlength="2000" required></textarea>
+                    <div class="d-flex justify-content-between">
+                      <div class="invalid-feedback">Message cannot be empty.</div>
+                      <small id="charCount" class="text-muted ms-auto">0 / 2000</small>
+                    </div>
+                  </div>
+                  <div class="col-md-8">
+                    <label for="capsuleCode" class="form-label">Capsule code</label>
+                    <div class="input-group input-group-lg">
+                      <input id="capsuleCode" class="form-control" placeholder="Auto-generated code" readonly>
+                      <button class="btn btn-outline-secondary" type="button" id="btnGenerate">Generate</button>
+                      <button class="btn btn-outline-secondary" type="button" id="btnCopy">Copy</button>
+                    </div>
+                    <div class="form-text">This code is needed to open your capsule later.</div>
+                  </div>
+                </div>
+
+                <div class="d-grid d-md-flex gap-2 mt-4">
+                  <button id="btnSend" class="btn btn-primary btn-lg px-4" type="submit">Send</button>
+                  <button id="btnReset" class="btn btn-outline-secondary btn-lg" type="button">Reset</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="open" class="mb-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="card shadow rounded-4 border-0">
+            <div class="card-body p-4 p-md-5">
+              <h2 class="h4 mb-3">Open an existing capsule</h2>
+              <div class="row g-3 align-items-end">
+                <div class="col-md-8">
+                  <label for="openCode" class="form-label">Enter capsule code</label>
+                  <input id="openCode" class="form-control form-control-lg" placeholder="Paste your capsule code here">
+                </div>
+                <div class="col-md-4 d-grid">
+                  <button id="btnOpen" class="btn btn-success btn-lg">Open</button>
+                </div>
+              </div>
+              <div id="openResult" class="mt-4"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="mb-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="card shadow-sm rounded-4 border-0">
+            <div class="card-body p-4">
+              <h2 class="h5">FAQ</h2>
+              <p class="mb-2"><strong>Where is my message saved?</strong><br> In your browser (localStorage) only, for demo purposes.</p>
+              <p class="mb-2"><strong>Can I share the capsule?</strong><br> Yes. Share the <em>code</em>. Anyone with the code can try to open it on/after the open date & time.</p>
+              <p class="mb-0"><strong>Is this real backend?</strong><br> No. This is an interactive demo using jQuery. You can replace storage with an API later.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal fade" id="sealedModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4">
+        <div class="modal-header">
+          <h5 class="modal-title">Your message is sealed! 🔒</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-2">Keep this code safe:</p>
+          <div class="input-group mb-3">
+            <input id="sealedCode" class="form-control" readonly>
+            <button class="btn btn-outline-secondary" type="button" id="btnCopyModal">Copy</button>
+          </div>
+          <p class="mb-0">Open date & time: <span id="sealedDate" class="fw-semibold"></span></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="mainToast" class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="toastText">Done.</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+  <footer>
+    Created by Nuraiym & Nurdaulet & Azat & Arsen © 2025 Time Capsule. All rights reserved.
+  </footer>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+  (function ($) {
+    const STORAGE_KEY = "capsules.v2";
+    const toastEl = document.getElementById('mainToast');
+    const toastTextEl = document.getElementById('toastText');
+    const toast = toastEl ? new bootstrap.Toast(toastEl) : null;
+
+    function showToast(msg) {
+      if (!toast) return;
+      toastTextEl.textContent = msg;
+      toast.show();
+    }
+
+    function getStore() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch {
+        return {};
+      }
+    }
+    function setStore(map) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
+    }
+
+    function nowLocalFloorToMinute() {
+      const d = new Date();
+      d.setSeconds(0,0);
+      return d;
+    }
+    function toDatetimeLocalValue(d) {
+      const pad = (n) => String(n).padStart(2,'0');
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function isDateTimeReached(localISO) {
+      const open = new Date(localISO.replace(' ', 'T'));
+      const now = new Date();
+      return now >= open;
+    }
+
+    function setMinDateTime() {
+      const now = nowLocalFloorToMinute();
+      $("#openDate").attr("min", toDatetimeLocalValue(now));
+    }
+
+    function updateCounter() {
+      const val = $("#message").val() || "";
+      $("#charCount").text(val.length + " / 2000");
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard?.writeText(text).then(() => {
+        showToast("Code copied to clipboard.");
+      }).catch(() => {
+        const $tmp = $("<textarea>").val(text).appendTo("body").select();
+        document.execCommand("copy");
+        $tmp.remove();
+        showToast("Code copied.");
+      });
+    }
+
+    $(function () {
+      setMinDateTime();
+      updateCounter();
+
+      $("#capsuleCode").val(generateCode());
+
+      $("#message").on("input", updateCounter);
+
+      $("#btnGenerate").on("click", function () {
+        $("#capsuleCode").val(generateCode());
+        showToast("New code generated.");
+      });
+
+      $("#btnCopy, #btnCopyModal").on("click", function () {
+        const code = $("#capsuleCode").val() || $("#sealedCode").val();
+        if (code) copyToClipboard(code);
+      });
+
+      $("#btnReset").on("click", function () {
+        $("#capsuleForm")[0].reset();
+        $("#capsuleCode").val(generateCode());
+        updateCounter();
+        setMinDateTime();
+        $(".is-invalid").removeClass("is-invalid");
+        showToast("Form cleared.");
+      });
+
+      $("#capsuleForm").on("submit", function (e) {
+        e.preventDefault();
+
+        const name = $("#loginName").val().trim();
+        const message = $("#message").val().trim();
+        const openDate = $("#openDate").val();
+        const code = $("#capsuleCode").val().trim();
+
+        let valid = true;
+        if (!name) { $("#loginName").addClass("is-invalid"); valid = false; } else { $("#loginName").removeClass("is-invalid"); }
+        if (!message) { $("#message").addClass("is-invalid"); valid = false; } else { $("#message").removeClass("is-invalid"); }
+        if (!openDate) { $("#openDate").addClass("is-invalid"); valid = false; } else { $("#openDate").removeClass("is-invalid"); }
+
+        const minVal = $("#openDate").attr("min");
+        if (openDate && minVal && openDate < minVal) {
+          $("#openDate").addClass("is-invalid");
+          valid = false;
+        }
+        if (!code) { $("#capsuleCode").addClass("is-invalid"); valid = false; } else { $("#capsuleCode").removeClass("is-invalid"); }
+
+        if (!valid) return;
+
+        const store = getStore();
+        if (store[code]) {
+          $("#capsuleCode").addClass("is-invalid");
+          showToast("This code already exists. Generate a new one.");
+          return;
+        }
+
+        const capsule = { code, name, message, openDate, createdAt: new Date().toISOString() };
+        store[code] = capsule;
+        setStore(store);
+
+        $("#sealedCode").val(code);
+        $("#sealedDate").text(openDate.replace('T',' '));
+        new bootstrap.Modal(document.getElementById('sealedModal')).show();
+
+        $("#btnSend").prop("disabled", true).text("Sealed!");
+        setTimeout(() => $("#btnSend").prop("disabled", false).text("Send"), 1200);
+        $("#message").val("");
+        updateCounter();
+      });
+
+      $("#btnOpen").on("click", function () {
+        const code = ($("#openCode").val() || "").trim();
+        const store = getStore();
+        const $out = $("#openResult");
+        $out.empty();
+
+        if (!code) {
+          $out.html('<div class="alert alert-warning">Please enter a capsule code.</div>');
+          return;
+        }
+        const data = store[code];
+        if (!data) {
+          $out.html('<div class="alert alert-danger">Capsule not found. Check the code.</div>');
+          return;
+        }
+
+        if (isDateTimeReached(data.openDate)) {
+          $out.html(`
+            <div class="unlocked">
+              <h3 class="h5 mb-1">✅ Capsule is unlocked</h3>
+              <p class="mb-2"><strong>From:</strong> ${$("<div>").text(data.name).html()}</p>
+              <p class="mb-2"><strong>Open time:</strong> ${data.openDate.replace('T',' ')}</p>
+              <hr>
+              <p class="mb-0" style="white-space: pre-wrap">${$("<div>").text(data.message).html()}</p>
+            </div>`);
+        } else {
+          $out.html(`
+            <div class="locked">
+              <h3 class="h5 mb-1">⏳ Capsule is still sealed</h3>
+              <p class="mb-2"><strong>Come back on:</strong> ${data.openDate.replace('T',' ')}</p>
+              <p class="mb-0">Keep the code safe: <code>${data.code}</code></p>
+            </div>`);
+        }
+      });
+    });
+
+    function generateCode(len = 8) {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let out = "";
+      for (let i = 0; i < len; i++) out += chars[Math.floor(Math.random() * chars.length)];
+      return out;
+    }
+  })(jQuery);
+
+
+  function initTheme() {
+    const button = document.getElementById('themeToggle');
+    if (!button) return;
+    
+    button.onclick = function() {
+        const html = document.documentElement;
+        const isDark = html.getAttribute('data-theme') === 'dark';
+        const newTheme = isDark ? 'light' : 'dark';
+        
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        
+        // Меняем иконку
+        const icon = button.querySelector('.theme-icon');
+        if (icon) {
+            icon.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+        }
+        
+        console.log('Theme switched to:', newTheme);
+    };
+}
+
+// Запускаем когда страница загрузится
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTheme);
+} else {
+    initTheme();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    const profileLink = document.getElementById('profileLink');
+    
+    if (currentUser && profileLink) {
+        profileLink.innerHTML = `👤 ${currentUser.name}`;
+        profileLink.style.color = '#c77dff';
+    }
+});
+  </script>
+</body>
+</html>

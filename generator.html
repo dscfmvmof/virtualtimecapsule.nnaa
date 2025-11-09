@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Virtual Time Capsule - Generator</title>
+    <style>
+        
+        *,*::before,*::after{box-sizing:border-box}
+        html,body{height:100%;margin:0;padding:0}
+
+        body{
+            margin:0;
+            padding:0;
+            background-color:#0a0a0f;
+            color:#e0d9ff;
+            font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+        }
+
+        header{
+            background-color:#1a1a2e;
+            padding:15px 20px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            box-shadow:0 2px 8px rgba(128,0,255,0.18);
+            position:sticky;
+            top:0;
+            z-index:10;
+        }
+
+        .logo-title{display:flex;align-items:center;gap:10px}
+        .logo{width:40px;height:40px;border-radius:50%;box-shadow:0 0 8px #9d4edd}
+        nav a{color:#c5b8ff;margin:0 12px;text-decoration:none;font-size:16px}
+        nav a:hover{color:#fff}
+
+        main{
+            flex:1;
+            display:flex;
+            align-items:flex-start;
+            justify-content:center;
+            padding:40px 20px;
+        }
+
+        .card{
+            width:100%;
+            max-width:720px;
+            background:#171722;
+            border-radius:14px;
+            padding:28px;
+            box-shadow:0 8px 30px rgba(0,0,0,0.5);
+        }
+
+        h1{margin:0 0 18px 0;font-size:28px;color:#f3e9ff;text-align:center}
+        p.lead{color:#cfc7f8;margin:0 0 18px 0;text-align:center}
+
+        .generator-box{display:flex;flex-direction:column;gap:12px}
+        .generator-box label{
+            color:#c5b8ff;
+            font-size:16px;
+            margin-left:4px;
+            text-shadow:0 0 6px #9d4edd;
+        }
+
+        .input-wrapper{position:relative}
+
+        textarea#topic{
+            width:100%;
+            height:100px; 
+            padding:14px 44px 14px 14px; 
+            border-radius:12px;
+            border:2px solid transparent;
+            background:linear-gradient(#1a1a2e,#1a1a2e) padding-box, linear-gradient(135deg,#9d4edd,#c77dff) border-box;
+            color:#e0d9ff;
+            font-size:15px;
+            line-height:1.4;
+            resize:none;
+            outline:none;
+            box-shadow:0 0 14px rgba(157,78,221,0.12);
+        }
+        textarea#topic:focus{box-shadow:0 0 28px rgba(157,78,221,0.28)}
+
+     
+        button.clear-btn{
+            position:absolute;
+            top:10px;
+            right:10px;
+            width:34px;height:34px;
+            border-radius:8px;
+            border:none;
+            background:transparent;
+            color:#cfc7f8;
+            font-size:18px;
+            cursor:pointer;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+        button.clear-btn:hover{color:#ffffff}
+
+      
+        .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+        button.primary{
+            background:linear-gradient(90deg,#9d4edd,#c77dff);
+            border:none;
+            color:#fff;
+            padding:12px 22px;
+            border-radius:10px;
+            cursor:pointer;
+            font-size:15px;
+            box-shadow:0 6px 18px rgba(157,78,221,0.18);
+        }
+        button.ghost{
+            background:#2a2f41;
+            color:#dcd6ff;
+            border:none;
+            padding:12px 18px;
+            border-radius:10px;
+            cursor:pointer;
+            font-size:15px;
+        }
+        button.small{padding:8px 12px;font-size:14px;border-radius:8px}
+
+        #result{
+            margin-top:6px;
+            background:#141422;
+            border-radius:12px;
+            padding:18px;
+            color:#e9e2ff;
+            min-height:120px;
+            max-height:420px;
+            overflow:auto;
+            white-space:pre-wrap;
+            outline:none;
+        }
+
+        .controls{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:6px;flex-wrap:wrap}
+        .stats{color:#bfb6ff;font-size:14px}
+
+        footer{background-color:#1a1a2e;text-align:center;padding:12px;color:#bdb2ff;font-size:13px;border-top:1px solid #2a2a40}
+
+        @media (max-width:520px){
+            .card{padding:18px}
+            h1{font-size:22px}
+            textarea#topic{height:90px}
+            #result{min-height:100px}
+            .row{justify-content:center}
+        }
+
+:root {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #1a1a2e;
+    --bg-card: #171722;
+    --text-primary: #e0d9ff;
+    --text-secondary: #c5b8ff;
+    --text-muted: #bdb2ff;
+    --accent-primary: #9d4edd;
+    --accent-secondary: #c77dff;
+    --border-color: #2a2a40;
+    --shadow-color: rgba(128, 0, 255, 0.18);
+}
+
+[data-theme="light"] {
+    --bg-primary: #f8f9fa;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --text-primary: #2d3748;
+    --text-secondary: #4a5568;
+    --text-muted: #718096;
+    --accent-primary: #7c3aed;
+    --accent-secondary: #8b5cf6;
+    --border-color: #e2e8f0;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+.theme-toggle {
+    margin-left: 20px;
+}
+
+.theme-btn {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.theme-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: "Poppins", sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+header {
+    background-color: var(--bg-secondary);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+nav a {
+    color: var(--text-secondary);
+    margin: 0 12px;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+nav a:hover {
+    color: var(--accent-secondary);
+}
+
+.logo-title h2 {
+    color: var(--text-secondary);
+    font-size: 18px;
+    margin: 0;
+    line-height: 1;
+}
+
+footer {
+    background-color: var(--bg-secondary);
+    text-align: center;
+    padding: 15px;
+    color: var(--text-muted);
+    font-size: 14px;
+    border-top: 1px solid var(--border-color);
+}
+
+.card {
+    width: 100%;
+    max-width: 720px;
+    background: var(--bg-card);
+    border-radius: 14px;
+    padding: 28px;
+    box-shadow: 0 8px 30px var(--shadow-color);
+}
+
+textarea#topic {
+    width: 100%;
+    height: 100px;
+    padding: 14px 44px 14px 14px;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box, 
+                linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)) border-box;
+    color: var(--text-primary);
+    font-size: 15px;
+    line-height: 1.4;
+    resize: none;
+    outline: none;
+    box-shadow: 0 0 14px var(--shadow-color);
+}
+
+.card {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.form-control {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Quotes Section */
+.quotes-section {
+    margin-top: 30px;
+    padding: 20px;
+    background: #1a1a2e;
+    border-radius: 12px;
+    border-left: 4px solid #9d4edd;
+}
+
+.quotes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.quotes-header h3 {
+    color: #c77dff;
+    margin: 0;
+    font-size: 18px;
+}
+
+.quote-card {
+    background: #0f0f17;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #2a2a40;
+}
+
+.quote-text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #e0d9ff;
+    margin-bottom: 10px;
+    font-style: italic;
+}
+
+.quote-author {
+    text-align: right;
+    color: #c5b8ff;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.quote-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.loading {
+    text-align: center;
+    color: #c5b8ff;
+    padding: 20px;
+}
+
+.error-message {
+    background: #2a1a2e;
+    color: #ff6b6b;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #ff6b6b;
+}
+
+@media (max-width: 520px) {
+    .quote-actions {
+        flex-direction: column;
+    }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-title">
+        <img src="vtc2.jpeg" alt="VTC" class="logo">
+        <h2 style="margin:0;color:#c5b8ff;font-size:18px">Virtual Time Capsule</h2>
+    </div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="auth.html" style>Profile</a>
+        <a href="generator.html">Generator</a>
+        <a href="capsule.html">Capsule</a>
+        
+    </nav>
+<div class="theme-toggle">
+    <button id="themeToggle" class="theme-btn" aria-label="Toggle dark mode">
+        <span class="theme-icon">🌙</span>
+    </button>
+</div>
+
+</header>
+
+<main>
+    <div class="card" role="region" aria-label="Time capsule generator">
+        <h1>Letter to the future</h1>
+        <p class="lead">Describe your topic briefly - AI will suggest a ready letter with placeholders</p>
+
+        <div class="generator-box">
+            <label for="topic">Your topic</label>
+            <div class="input-wrapper">
+                <textarea id="topic" maxlength="200" placeholder="Example: Hello from the past"></textarea>
+                <button class="clear-btn" id="clearBtn" title="Clear input" aria-label="Clear input">✕</button>
+            </div>
+
+            <div class="row">
+                <button class="primary" id="generateBtn">Generate</button>
+                <button class="ghost small" id="copyBtn">Copy text</button>
+                <div style="flex:1"></div>
+                <div class="stats" id="inputStats">0 / 200 characters</div>
+            </div>
+
+            <div id="result" contenteditable="true" aria-label="Generated text"></div>
+
+            <div class="controls">
+                <div class="stats" id="resultStats">0 chars • 0 words</div>
+                <div style="flex:1"></div>
+                <button class="ghost small" id="resetResultBtn">Clear output</button>
+            </div>
+
+
+             <!-- New Quotes Section -->
+<div class="quotes-section">
+    <div class="quotes-header">
+        <h3>💫 Inspirational Quotes for Your Letter</h3>
+        <button class="ghost small" id="refreshQuotes">Refresh</button>
+    </div>
+    <div id="quotesContainer">
+        <div class="loading">Loading inspirational quotes...</div>
+    </div>
+</div>
+
+
+        </div>
+    </div>
+</main>
+
+<footer>
+    Created by Nuraiym & Nurdaulet & Azat & Arsen © 2025 Time Capsule. All rights reserved.
+</footer>
+
+<script>
+   
+    const topic = document.getElementById('topic');
+    const inputStats = document.getElementById('inputStats');
+    const clearBtn = document.getElementById('clearBtn');
+    const genBtn = document.getElementById('generateBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const result = document.getElementById('result');
+    const resultStats = document.getElementById('resultStats');
+    const resetResultBtn = document.getElementById('resetResultBtn');
+
+   
+    topic.addEventListener('input', () => {
+        if (topic.value.length > 200) topic.value = topic.value.slice(0, 200);
+        updateInputStats();
+    });
+    function updateInputStats() {
+        inputStats.textContent = `${topic.value.length} / 200 characters`;
+    }
+    updateInputStats();
+
+   
+    clearBtn.addEventListener('click', () => {
+        topic.value = '';
+        updateInputStats();
+        topic.focus();
+    });
+
+    async function generateText(idea){
+        const promptText = `Write a letter to yourself in the future on the topic: "${idea}". Format the text nicely, like a real letter, but don't include any specific details. Instead, use clear placeholders in curly brackets so that the user can fill them in later. For example: {name}, {city}, {goal}, {feeling}, {dream}, {person's_name}. The text should sound natural, simple, as if the person is writing it themselves. Write in English.`;
+        const encoded = encodeURIComponent(promptText);
+        const url = `https://text.pollinations.ai/${encoded}`;
+
+
+        result.textContent = 'Generating...';
+        updateResultStats();
+
+        try {
+            const resp = await fetch(url, { method: 'GET' });
+            if (!resp.ok) throw new Error('API response ' + resp.status);
+            const text = await resp.text();
+
+         
+            if (!text || text.trim().length < 10) throw new Error('Empty or too short response');
+
+            result.textContent = text.trim();
+        } catch (err) {
+           
+            console.warn('Pollinations API failed, using fallback. Error:', err);
+            result.textContent = `Dear {name},
+
+I hope this letter finds you well in {city}. Remember your goal: {goal}. Keep dreaming {dream} and feeling {feeling}. Continue learning and growing every day.
+
+Best regards,
+Future You`;
+        } finally {
+            updateResultStats();
+        }
+    }
+
+
+    genBtn.addEventListener('click', () => {
+        const val = topic.value.trim();
+        if (!val) {
+            result.textContent = 'Please enter a topic to generate the letter.';
+            updateResultStats();
+            return;
+        }
+        generateText(val);
+    });
+
+
+
+    topic.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            genBtn.click();
+        }
+    });
+
+   
+    copyBtn.addEventListener('click', async () => {
+        try {
+            const text = result.innerText.trim();
+            if (!text) return;
+            await navigator.clipboard.writeText(text);
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => { copyBtn.textContent = 'Copy text'; }, 1400);
+        } catch (err) {
+            console.error('Copy failed', err);
+            copyBtn.textContent = 'Error';
+            setTimeout(() => { copyBtn.textContent = 'Copy text'; }, 1400);
+        }
+    });
+
+    
+    function updateResultStats() {
+        const txt = result.innerText || '';
+        const chars = txt.length;
+        const words = txt.trim() ? txt.trim().split(/\s+/).length : 0;
+        resultStats.textContent = `${chars} chars • ${words} words`;
+    }
+    result.addEventListener('input', updateResultStats);
+    updateResultStats();
+
+   
+    resetResultBtn.addEventListener('click', () => {
+        result.textContent = '';
+        updateResultStats();
+    });
+
+   
+    result.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            document.execCommand('insertText', false, '  ');
+        }
+    });
+
+function initTheme() {
+    const button = document.getElementById('themeToggle');
+    if (!button) return;
+    
+    button.onclick = function() {
+        const html = document.documentElement;
+        const isDark = html.getAttribute('data-theme') === 'dark';
+        const newTheme = isDark ? 'light' : 'dark';
+        
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        
+        const icon = button.querySelector('.theme-icon');
+        if (icon) {
+            icon.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+        }
+        
+        console.log('Theme switched to:', newTheme);
+    };
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTheme);
+} else {
+    initTheme();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    const profileLink = document.getElementById('profileLink');
+    
+    if (currentUser && profileLink) {
+        profileLink.innerHTML = `👤 ${currentUser.name}`;
+        profileLink.style.color = '#c77dff';
+    }
+});
+
+
+
+
+
+
+
+
+
+// QUOTES API INTEGRATION - ENGLISH QUOTES ONLY
+class QuotesAPI {
+    constructor() {
+        this.quotesContainer = document.getElementById('quotesContainer');
+        this.refreshBtn = document.getElementById('refreshQuotes');
+        this.init();
+    }
+
+    init() {
+        this.refreshBtn.addEventListener('click', () => this.fetchQuotes());
+        this.fetchQuotes();
+    }
+
+    async fetchQuotes() {
+        this.showLoading();
+        
+        try {
+            // Try Quotable API first (English quotes)
+            const response = await fetch('https://api.quotable.io/random');
+            if (response.ok) {
+                const data = await response.json();
+                this.displayQuotes([{
+                    text: data.content,
+                    author: data.author,
+                    source: 'Quotable API'
+                }]);
+                return;
+            }
+        } catch (error) {
+            console.log('Quotable API failed, using fallback quotes');
+        }
+
+        // Fallback to local English quotes
+        this.showFallbackQuotes();
+    }
+
+    showFallbackQuotes() {
+        const fallbackQuotes = [
+            {
+                text: "The future belongs to those who believe in the beauty of their dreams.",
+                author: "Eleanor Roosevelt"
+            },
+            {
+                text: "It is during our darkest moments that we must focus to see the light.",
+                author: "Aristotle"
+            },
+            {
+                text: "Whoever is happy will make others happy too.",
+                author: "Anne Frank"
+            },
+            {
+                text: "The only way to do great work is to love what you do.",
+                author: "Steve Jobs"
+            },
+            {
+                text: "If you look at what you have in life, you'll always have more.",
+                author: "Oprah Winfrey"
+            },
+            {
+                text: "Life is what happens to you while you're busy making other plans.",
+                author: "John Lennon"
+            },
+            {
+                text: "The way to get started is to quit talking and begin doing.",
+                author: "Walt Disney"
+            },
+            {
+                text: "Your time is limited, so don't waste it living someone else's life.",
+                author: "Steve Jobs"
+            },
+            {
+                text: "The purpose of our lives is to be happy.",
+                author: "Dalai Lama"
+            },
+            {
+                text: "You only live once, but if you do it right, once is enough.",
+                author: "Mae West"
+            }
+        ];
+        
+        const randomQuote = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
+        this.displayQuotes([randomQuote]);
+    }
+
+    displayQuotes(quotes) {
+        this.quotesContainer.innerHTML = '';
+        
+        quotes.forEach(quote => {
+            const quoteElement = this.createQuoteElement(quote);
+            this.quotesContainer.appendChild(quoteElement);
+        });
+    }
+
+    createQuoteElement(quote) {
+        const quoteDiv = document.createElement('div');
+        quoteDiv.className = 'quote-card';
+        
+        quoteDiv.innerHTML = `
+            <div class="quote-text">"${this.escapeHtml(quote.text)}"</div>
+            <div class="quote-author">— ${this.escapeHtml(quote.author)}</div>
+            <div class="quote-actions">
+                <button class="ghost small use-quote" data-quote="${this.escapeHtml(quote.text)}">
+                    Use in Letter
+                </button>
+                <button class="ghost small copy-quote" data-quote="${this.escapeHtml(quote.text)}">
+                    Copy Quote
+                </button>
+            </div>
+        `;
+
+        // Add event listeners
+        quoteDiv.querySelector('.use-quote').addEventListener('click', (e) => {
+            this.useQuoteInLetter(e.target.dataset.quote);
+        });
+
+        quoteDiv.querySelector('.copy-quote').addEventListener('click', (e) => {
+            this.copyQuoteToClipboard(e.target.dataset.quote);
+        });
+
+        return quoteDiv;
+    }
+
+    useQuoteInLetter(quote) {
+        const currentText = result.textContent.trim();
+        const newText = currentText ? `${currentText}\n\nInspirational quote: "${quote}"` : `Inspirational quote: "${quote}"`;
+        result.textContent = newText;
+        updateResultStats();
+        
+        // Show confirmation
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = 'Added!';
+        setTimeout(() => { btn.textContent = originalText; }, 2000);
+    }
+
+    async copyQuoteToClipboard(quote) {
+        try {
+            await navigator.clipboard.writeText(`"${quote}"`);
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(() => { btn.textContent = originalText; }, 2000);
+        } catch (err) {
+            console.error('Copy failed:', err);
+        }
+    }
+
+    showLoading() {
+        this.quotesContainer.innerHTML = '<div class="loading">Loading inspirational quotes...</div>';
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+}
+
+// Initialize Quotes API
+const quotesAPI = new QuotesAPI();
+</script>
+
+
+</body>
+</html>
+

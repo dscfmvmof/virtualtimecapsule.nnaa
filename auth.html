@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Virtual Time Capsule — Authentication</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0a0a0f; /* Изначальный черный фон */
+      color: #e0d9ff;
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Light/Dark Mode Variables */
+    :root {
+        --bg-primary: #0a0a0f;
+        --bg-secondary: #1a1a2e;
+        --bg-card: #171722;
+        --text-primary: #e0d9ff;
+        --text-secondary: #c5b8ff;
+        --text-muted: #bdb2ff;
+        --accent-primary: #9d4edd;
+        --accent-secondary: #c77dff;
+        --border-color: #2a2a40;
+        --shadow-color: rgba(128, 0, 255, 0.18);
+    }
+
+    [data-theme="light"] {
+        --bg-primary: #f8f9fa;
+        --bg-secondary: #ffffff;
+        --bg-card: #ffffff;
+        --text-primary: #2d3748;
+        --text-secondary: #4a5568;
+        --text-muted: #718096;
+        --accent-primary: #7c3aed;
+        --accent-secondary: #8b5cf6;
+        --border-color: #e2e8f0;
+        --shadow-color: rgba(0, 0, 0, 0.1);
+    }
+
+    /* Применяем CSS переменные */
+    body {
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+    }
+
+    header {
+      background-color: var(--bg-secondary);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px var(--shadow-color);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    nav a {
+      color: var(--text-secondary);
+      margin: 0 12px;
+      text-decoration: none;
+      font-size: 16px;
+    }
+
+    nav a:hover {
+      color: var(--accent-secondary);
+    }
+
+    .logo-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-primary);
+      margin: 0;
+    }
+
+    .logo-title h2 {
+      color: var(--text-secondary);
+      font-size: 18px;
+      margin: 0;
+      line-height: 1;
+    }
+
+    .theme-toggle {
+        margin-left: 20px;
+    }
+
+    .theme-btn {
+        background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px var(--shadow-color);
+    }
+
+    .theme-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px var(--shadow-color);
+    }
+
+    .auth-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+      padding: 40px 20px;
+    }
+
+    .auth-card {
+      background: var(--bg-card);
+      border-radius: 15px;
+      padding: 40px;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 10px 30px var(--shadow-color);
+    }
+
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 30px;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 15px;
+      text-align: center;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .auth-tab.active {
+      color: var(--accent-secondary);
+      border-bottom: 3px solid var(--accent-secondary);
+    }
+
+    .auth-form {
+      display: none;
+    }
+
+    .auth-form.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(157, 78, 221, 0.1);
+    }
+
+    .form-control.error {
+      border-color: #ff6b6b;
+    }
+
+    .error-message {
+      color: #ff6b6b;
+      font-size: 13px;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .password-strength {
+      margin-top: 8px;
+      height: 4px;
+      background: var(--border-color);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .strength-bar {
+      height: 100%;
+      width: 0%;
+      transition: all 0.3s ease;
+    }
+
+    .strength-weak { background: #ff6b6b; width: 33%; }
+    .strength-medium { background: #ffd166; width: 66%; }
+    .strength-strong { background: #06d6a0; width: 100%; }
+
+    .btn-primary {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(157, 78, 221, 0.4);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .user-info {
+      text-align: center;
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(157, 78, 221, 0.1);
+      border-radius: 8px;
+      display: none;
+    }
+
+    .user-info.active {
+      display: block;
+    }
+
+    footer {
+      background-color: var(--bg-secondary);
+      text-align: center;
+      padding: 15px;
+      color: var(--text-muted);
+      font-size: 14px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    @media (max-width: 600px) {
+      .auth-card {
+        padding: 30px 20px;
+        margin: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-title">
+      <img src="vtc2.jpeg" alt="VTC Logo" class="logo">
+      <h2>Virtual Time Capsule</h2>
+    </div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="auth.html" >Profile</a>
+      <a href="generator.html">Generator</a>
+      <a href="capsule.html">Capsule</a>
+    </nav>
+    <div class="theme-toggle">
+    <button id="themeToggle" class="theme-btn" aria-label="Toggle dark mode">
+        <span class="theme-icon">🌙</span>
+    </button>
+</div>
+  </header>
+
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Login</button>
+        <button class="auth-tab" data-tab="signup">Sign Up</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="auth-form active">
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email" required>
+          <div class="error-message" id="loginEmailError"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" required>
+          <div class="error-message" id="loginPasswordError"></div>
+        </div>
+
+        <button type="submit" class="btn-primary">Login</button>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form id="signupForm" class="auth-form">
+        <div class="form-group">
+          <label for="signupName">Full Name</label>
+          <input type="text" id="signupName" class="form-control" placeholder="Enter your full name" required>
+          <div class="error-message" id="signupNameError"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" class="form-control" placeholder="Enter your email" required>
+          <div class="error-message" id="signupEmailError"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" class="form-control" placeholder="Create a password" required>
+          <div class="password-strength">
+            <div class="strength-bar" id="passwordStrength"></div>
+          </div>
+          <div class="error-message" id="signupPasswordError"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="signupConfirmPassword">Confirm Password</label>
+          <input type="password" id="signupConfirmPassword" class="form-control" placeholder="Confirm your password" required>
+          <div class="error-message" id="signupConfirmPasswordError"></div>
+        </div>
+
+        <button type="submit" class="btn-primary">Create Account</button>
+      </form>
+
+      <!-- User Profile -->
+      <div id="userProfile" class="user-info">
+        <h3>Welcome, <span id="userName"></span>!</h3>
+        <p>Email: <span id="userEmail"></span></p>
+        <p>Member since: <span id="memberSince"></span></p>
+        <button id="logoutBtn" class="btn-primary" style="background: #6c757d; margin-top: 15px;">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Created by Nuraiym & Nurdaulet & Azat & Arsen © 2025 Time Capsule. All rights reserved.
+  </footer>
+
+  <script>
+    class AuthSystem {
+      constructor() {
+        this.currentUser = null;
+        this.init();
+      }
+
+      init() {
+        this.loadUser();
+        this.setupEventListeners();
+        this.updateUI();
+      }
+
+      setupEventListeners() {
+        // Tab switching
+        $('.auth-tab').on('click', (e) => {
+          const tab = $(e.target).data('tab');
+          this.switchTab(tab);
+        });
+
+        // Form submissions
+        $('#loginForm').on('submit', (e) => this.handleLogin(e));
+        $('#signupForm').on('submit', (e) => this.handleSignup(e));
+
+        // Password strength
+        $('#signupPassword').on('input', () => this.checkPasswordStrength());
+
+        // Logout
+        $('#logoutBtn').on('click', () => this.handleLogout());
+
+        // Real-time validation
+        $('#signupEmail').on('blur', () => this.validateEmail('signup'));
+        $('#loginEmail').on('blur', () => this.validateEmail('login'));
+        $('#signupPassword').on('blur', () => this.validatePassword());
+        $('#signupConfirmPassword').on('blur', () => this.validatePasswordConfirm());
+      }
+
+      switchTab(tab) {
+        $('.auth-tab').removeClass('active');
+        $(`.auth-tab[data-tab="${tab}"]`).addClass('active');
+        
+        $('.auth-form').removeClass('active');
+        $(`#${tab}Form`).addClass('active');
+        
+        this.clearErrors();
+      }
+
+      validateEmail(formType) {
+        const email = $(`#${formType}Email`).val();
+        const errorElement = $(`#${formType}EmailError`);
+        
+        if (!email) {
+          this.showError(errorElement, 'Email is required');
+          return false;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          this.showError(errorElement, 'Please enter a valid email address');
+          return false;
+        }
+
+        this.hideError(errorElement);
+        return true;
+      }
+
+      validatePassword() {
+        const password = $('#signupPassword').val();
+        const errorElement = $('#signupPasswordError');
+        
+        if (!password) {
+          this.showError(errorElement, 'Password is required');
+          return false;
+        }
+
+        if (password.length < 8) {
+          this.showError(errorElement, 'Password must be at least 8 characters long');
+          return false;
+        }
+
+        if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(password)) {
+          this.showError(errorElement, 'Password must contain uppercase, lowercase, number and special character');
+          return false;
+        }
+
+        this.hideError(errorElement);
+        return true;
+      }
+
+      validatePasswordConfirm() {
+        const password = $('#signupPassword').val();
+        const confirmPassword = $('#signupConfirmPassword').val();
+        const errorElement = $('#signupConfirmPasswordError');
+        
+        if (password !== confirmPassword) {
+          this.showError(errorElement, 'Passwords do not match');
+          return false;
+        }
+
+        this.hideError(errorElement);
+        return true;
+      }
+
+      checkPasswordStrength() {
+        const password = $('#signupPassword').val();
+        const strengthBar = $('#passwordStrength');
+        
+        let strength = 0;
+        
+        if (password.length >= 8) strength++;
+        if (/[a-z]/.test(password)) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[@$!%*?&]/.test(password)) strength++;
+        
+        strengthBar.removeClass('strength-weak strength-medium strength-strong');
+        
+        if (strength <= 2) {
+          strengthBar.addClass('strength-weak');
+        } else if (strength <= 4) {
+          strengthBar.addClass('strength-medium');
+        } else {
+          strengthBar.addClass('strength-strong');
+        }
+      }
+
+      async handleLogin(e) {
+        e.preventDefault();
+        
+        if (!this.validateEmail('login')) return;
+
+        const email = $('#loginEmail').val();
+        const password = $('#loginPassword').val();
+        
+        if (!password) {
+          this.showError($('#loginPasswordError'), 'Password is required');
+          return;
+        }
+
+        // Simulate API call
+        await this.simulateApiCall();
+        
+        const users = JSON.parse(localStorage.getItem('users') || '{}');
+        const user = users[email];
+        
+        if (user && user.password === password) {
+          this.currentUser = { email, name: user.name, joinDate: user.joinDate };
+          this.saveUser();
+          this.updateUI();
+          this.showMessage('Login successful!', 'success');
+        } else {
+          this.showError($('#loginPasswordError'), 'Invalid email or password');
+        }
+      }
+
+      async handleSignup(e) {
+        e.preventDefault();
+        
+        if (!this.validateEmail('signup') || !this.validatePassword() || !this.validatePasswordConfirm()) {
+          return;
+        }
+
+        const name = $('#signupName').val();
+        const email = $('#signupEmail').val();
+        const password = $('#signupPassword').val();
+        
+        if (!name) {
+          this.showError($('#signupNameError'), 'Name is required');
+          return;
+        }
+
+        // Simulate API call
+        await this.simulateApiCall();
+
+        const users = JSON.parse(localStorage.getItem('users') || '{}');
+        
+        if (users[email]) {
+          this.showError($('#signupEmailError'), 'Email already registered');
+          return;
+        }
+
+        users[email] = {
+          name: name,
+          password: password,
+          joinDate: new Date().toISOString()
+        };
+
+        localStorage.setItem('users', JSON.stringify(users));
+        
+        this.currentUser = { email, name, joinDate: users[email].joinDate };
+        this.saveUser();
+        this.updateUI();
+        this.showMessage('Account created successfully!', 'success');
+        
+        // Clear form
+        $('#signupForm')[0].reset();
+        $('#passwordStrength').removeClass('strength-weak strength-medium strength-strong');
+        $('#passwordStrength').css('width', '0');
+      }
+
+      handleLogout() {
+        this.currentUser = null;
+        localStorage.removeItem('currentUser');
+        this.updateUI();
+        this.switchTab('login');
+        this.showMessage('Logged out successfully', 'info');
+      }
+
+      loadUser() {
+        const userData = localStorage.getItem('currentUser');
+        if (userData) {
+          this.currentUser = JSON.parse(userData);
+        }
+      }
+
+      saveUser() {
+        if (this.currentUser) {
+          localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+        }
+      }
+
+      updateUI() {
+        if (this.currentUser) {
+          $('#userName').text(this.currentUser.name);
+          $('#userEmail').text(this.currentUser.email);
+          $('#memberSince').text(new Date(this.currentUser.joinDate).toLocaleDateString());
+          $('#userProfile').addClass('active');
+          $('.auth-form').removeClass('active');
+          $('.auth-tabs').hide();
+        } else {
+          $('#userProfile').removeClass('active');
+          $('.auth-tabs').show();
+        }
+      }
+
+      showError(element, message) {
+        element.text(message).show();
+        element.prev('.form-control').addClass('error');
+      }
+
+      hideError(element) {
+        element.hide();
+        element.prev('.form-control').removeClass('error');
+      }
+
+      clearErrors() {
+        $('.error-message').hide();
+        $('.form-control').removeClass('error');
+      }
+
+      showMessage(message, type) {
+        // Simple alert for demo - you can replace with toast notification
+        alert(message);
+      }
+
+      simulateApiCall() {
+        return new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+
+    // Initialize auth system when page loads
+    $(document).ready(() => {
+      new AuthSystem();
+    });
+
+// Простой переключатель темы
+function initTheme() {
+    const button = document.getElementById('themeToggle');
+    if (!button) return;
+    
+    button.onclick = function() {
+        const html = document.documentElement;
+        const isDark = html.getAttribute('data-theme') === 'dark';
+        const newTheme = isDark ? 'light' : 'dark';
+        
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        
+        // Меняем иконку
+        const icon = button.querySelector('.theme-icon');
+        if (icon) {
+            icon.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+        }
+        
+        console.log('Theme switched to:', newTheme);
+    };
+}
+
+// Запускаем когда страница загрузится
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTheme);
+} else {
+    initTheme();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    const profileLink = document.getElementById('profileLink');
+    
+    if (currentUser && profileLink) {
+        profileLink.innerHTML = `👤 ${currentUser.name}`;
+        profileLink.style.color = '#c77dff';
+    }
+});
+  </script>
+</body>
+</html>
